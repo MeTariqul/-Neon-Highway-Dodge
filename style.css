@@ -87,6 +87,27 @@ body {
     margin-bottom: 5px;
     border: 1px solid #00a8ff;
     color: #00ffff;
+    text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+}
+
+#rank {
+    background: rgba(0, 20, 40, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #00a8ff;
+    color: #00ffff;
+    text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+}
+
+#combo {
+    background: rgba(40, 20, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #ff6b35;
+    color: #ff9f43;
+    text-shadow: 0 0 5px rgba(255, 159, 67, 0.5);
 }
 
 .menu-buttons {
@@ -263,6 +284,97 @@ body {
 
 .hidden {
     display: none;
+}
+
+/* Upgrade shop styles */
+#upgradeShopScreen {
+    background: radial-gradient(circle at center, rgba(20, 0, 40, 0.9) 0%, rgba(10, 0, 20, 0.9) 70%, rgba(5, 0, 15, 0.9) 100%);
+}
+
+#upgradesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.upgrade-item {
+    background: rgba(0, 30, 60, 0.7);
+    border: 2px solid #00a8ff;
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 168, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.upgrade-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 168, 255, 0.5);
+    border-color: #00ffff;
+}
+
+.upgrade-item h3 {
+    color: #00ffff;
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    text-shadow: 0 0 10px rgba(0, 200, 255, 0.6);
+}
+
+.upgrade-item p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #e6f7ff;
+}
+
+.cost {
+    color: #ffcc00;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.status {
+    margin: 10px 0;
+}
+
+.purchased {
+    color: #00cc66;
+    font-weight: bold;
+}
+
+.available {
+    color: #ff6b35;
+    font-weight: bold;
+}
+
+.purchase-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background: linear-gradient(145deg, #ff6b35, #ffcc00);
+    color: #000;
+    border: 2px solid #ffcc00;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.purchase-btn:hover:not(:disabled) {
+    background: linear-gradient(145deg, #ffcc00, #ff6b35);
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+}
+
+.purchase-btn:disabled {
+    background: #555;
+    border-color: #777;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Responsive design for mobile */

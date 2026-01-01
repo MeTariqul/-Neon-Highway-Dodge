@@ -12,12 +12,34 @@ function render(gameState, ctx, CONFIG) {
     if (gameState.state === CONFIG.GAME_STATES.PLAYING || gameState.state === CONFIG.GAME_STATES.PAUSED) {
         // Draw obstacles (enemy cars)
         for (const obstacle of gameState.obstacles) {
-            drawEnemyCar(obstacle, ctx, gameState, CONFIG);
+            // Only draw obstacles that are on screen
+            if (obstacle.y > -obstacle.height && obstacle.y < CONFIG.GAME_HEIGHT) {
+                drawEnemyCar(obstacle, ctx, gameState, CONFIG);
+            }
         }
         
         // Draw coins
         for (const coin of gameState.coins) {
-            drawCoin(coin, ctx, CONFIG);
+            // Only draw coins that are on screen
+            if (coin.y > -coin.height && coin.y < CONFIG.GAME_HEIGHT) {
+                drawCoin(coin, ctx, CONFIG);
+            }
+        }
+        
+        // Draw power-ups
+        for (const powerup of gameState.powerups) {
+            // Only draw power-ups that are on screen
+            if (powerup.y > -powerup.height && powerup.y < CONFIG.GAME_HEIGHT) {
+                drawPowerup(powerup, ctx, CONFIG);
+            }
+        }
+        
+        // Draw particles
+        for (const particle of gameState.particles) {
+            // Only draw particles that are visible (life > 0)
+            if (particle.life > 0) {
+                drawParticle(particle, ctx);
+            }
         }
         
         // Draw player car
@@ -47,12 +69,24 @@ function drawRoad(ctx, CONFIG) {
     
     // Draw grassy sides
     ctx.fillStyle = '#4a7c59';
-    ctx.fillRect(0, 0, 50, CONFIG.GAME_HEIGHT); // Left grass
-    ctx.fillRect(CONFIG.GAME_WIDTH - 50, 0, 50, CONFIG.GAME_HEIGHT); // Right grass
+    ctx.fillRect(0, 0, CONFIG.LANE_OFFSET, CONFIG.GAME_HEIGHT); // Left grass
+    ctx.fillRect(CONFIG.GAME_WIDTH - CONFIG.LANE_OFFSET, 0, CONFIG.LANE_OFFSET, CONFIG.GAME_HEIGHT); // Right grass
     
-    // Draw road markings
+    // Draw lane dividers
     ctx.strokeStyle = 'white';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([20, 15]); // Dashed line
+    
+    // Draw lane dividers
+    for (let i = 1; i < CONFIG.NUM_LANES; i++) {
+        const x = CONFIG.LANE_OFFSET + i * CONFIG.LANE_WIDTH;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, CONFIG.GAME_HEIGHT);
+        ctx.stroke();
+    }
+    
+    // Draw center line
     ctx.setLineDash([20, 15]); // Dashed line
     ctx.beginPath();
     ctx.moveTo(CONFIG.GAME_WIDTH / 2, 0);
@@ -64,13 +98,13 @@ function drawRoad(ctx, CONFIG) {
     ctx.strokeStyle = 'yellow';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(50, 0);
-    ctx.lineTo(50, CONFIG.GAME_HEIGHT);
+    ctx.moveTo(CONFIG.LANE_OFFSET, 0);
+    ctx.lineTo(CONFIG.LANE_OFFSET, CONFIG.GAME_HEIGHT);
     ctx.stroke();
     
     ctx.beginPath();
-    ctx.moveTo(CONFIG.GAME_WIDTH - 50, 0);
-    ctx.lineTo(CONFIG.GAME_WIDTH - 50, CONFIG.GAME_HEIGHT);
+    ctx.moveTo(CONFIG.GAME_WIDTH - CONFIG.LANE_OFFSET, 0);
+    ctx.lineTo(CONFIG.GAME_WIDTH - CONFIG.LANE_OFFSET, CONFIG.GAME_HEIGHT);
     ctx.stroke();
 }
 
@@ -93,6 +127,24 @@ function drawPlayerCar(gameState, ctx, CONFIG) {
     ctx.fillRect(player.x + player.width - 1, player.y + 5, 3, 10); // Right front wheel
     ctx.fillRect(player.x - 2, player.y + player.height - 15, 3, 10); // Left rear wheel
     ctx.fillRect(player.x + player.width - 1, player.y + player.height - 15, 3, 10); // Right rear wheel
+    
+    // Draw shield indicator if active
+    if (gameState.activePowerups.shield) {
+        ctx.strokeStyle = '#3498db'; // Blue border
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2 + 5, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Add a pulsing effect
+        const pulse = Math.sin(Date.now() / 200) * 2;
+        ctx.shadowColor = '#3498db';
+        ctx.shadowBlur = 10 + pulse;
+        ctx.beginPath();
+        ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2 + 5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.shadowBlur = 0; // Reset shadow
+    }
 }
 
 // Draw enemy car
@@ -138,6 +190,81 @@ function drawCoin(coin, ctx, CONFIG) {
     ctx.beginPath();
     ctx.arc(coin.x + coin.width/2, coin.y + coin.height/2, coin.width/4, 0, Math.PI * 2);
     ctx.fill();
+}
+
+// Draw power-up
+function drawPowerup(powerup, ctx, CONFIG) {
+    // Different colors for different power-up types
+    let color;
+    switch(powerup.type) {
+        case CONFIG.POWERUP_TYPES.SHIELD:
+            color = '#3498db'; // Blue for shield
+            break;
+        case CONFIG.POWERUP_TYPES.SLOWMO:
+            color = '#e74c3c'; // Red for slow motion
+            break;
+        case CONFIG.POWERUP_TYPES.SCORE_MULTIPLIER:
+            color = '#f1c40f'; // Yellow for score multiplier
+            break;
+        default:
+            color = '#ffffff'; // White as fallback
+    }
+    
+    // Draw power-up as a square with a symbol inside
+    ctx.fillStyle = color;
+    ctx.fillRect(powerup.x, powerup.y, powerup.width, powerup.height);
+    
+    // Draw a border
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(powerup.x, powerup.y, powerup.width, powerup.height);
+    
+    // Draw a symbol inside based on type
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    let symbol;
+    switch(powerup.type) {
+        case CONFIG.POWERUP_TYPES.SHIELD:
+            symbol = 'S'; // Shield
+            break;
+        case CONFIG.POWERUP_TYPES.SLOWMO:
+            symbol = 'T'; // Time
+            break;
+        case CONFIG.POWERUP_TYPES.SCORE_MULTIPLIER:
+            symbol = 'X'; // Multiplier
+            break;
+    }
+    
+    ctx.fillText(symbol, powerup.x + powerup.width/2, powerup.y + powerup.height/2);
+}
+
+// Draw a particle
+function drawParticle(particle, ctx) {
+    // Calculate alpha based on remaining life
+    const alpha = particle.life / particle.maxLife;
+    
+    // Skip drawing if particle is almost invisible
+    if (alpha < 0.05) return;
+    
+    // Create gradient for particle
+    const gradient = ctx.createRadialGradient(
+        particle.x, particle.y, 0,
+        particle.x, particle.y, particle.size
+    );
+    
+    // Set gradient colors based on the particle's color
+    gradient.addColorStop(0, particle.color);
+    gradient.addColorStop(1, `${particle.color}${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`);
+    
+    ctx.fillStyle = gradient;
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1; // Reset alpha
 }
 
 // Helper function to lighten a color
@@ -200,7 +327,7 @@ function drawStar(ctx, cx, cy, outerRadius, innerRadius) {
 
 // Export rendering functions for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { render, drawRoad, drawPlayerCar, drawEnemyCar, drawCoin, lightenColor, darkenColor };
+    module.exports = { render, drawRoad, drawPlayerCar, drawEnemyCar, drawCoin, drawPowerup, drawParticle, lightenColor, darkenColor };
 } else {
-    window.Rendering = { render, drawRoad, drawPlayerCar, drawEnemyCar, drawCoin, lightenColor, darkenColor };
+    window.Rendering = { render, drawRoad, drawPlayerCar, drawEnemyCar, drawCoin, drawPowerup, drawParticle, lightenColor, darkenColor };
 }

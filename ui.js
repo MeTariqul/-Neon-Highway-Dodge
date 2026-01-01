@@ -152,6 +152,11 @@ function updateLevel(levelElement, gameState) {
     levelElement.textContent = `Level: ${gameState.level}`;
 }
 
+// Update combo display
+function updateCombo(comboElement, gameState) {
+    comboElement.textContent = `Combo: ${gameState.combo}`;
+}
+
 // Menu functions
 function showMainMenu(setGameState, CONFIG) {
     setGameState(CONFIG.GAME_STATES.MENU);
@@ -186,6 +191,54 @@ function goToMainMenu(setGameState, CONFIG) {
     setGameState(CONFIG.GAME_STATES.MENU);
 }
 
+// Show upgrade shop screen
+function showUpgradeShop(mainMenu, upgradeShopScreen) {
+    // Hide all screens first
+    mainMenu.classList.add('hidden');
+    upgradeShopScreen.classList.remove('hidden');
+    
+    // Update the upgrade shop display
+    updateUpgradeShopDisplay(upgradeShopScreen);
+}
+
+// Update the upgrade shop display
+function updateUpgradeShopDisplay(upgradeShopScreen) {
+    // Get the container for upgrades
+    const upgradesContainer = upgradeShopScreen.querySelector('#upgradesContainer');
+    if (!upgradesContainer) return;
+    
+    // Clear the container
+    upgradesContainer.innerHTML = '';
+    
+    // Get available upgrades
+    const upgrades = window.getAvailableUpgrades();
+    const playerScore = window.getPlayerScore();
+    
+    // Create upgrade elements
+    upgrades.forEach(upgrade => {
+        const isPurchased = window.isUpgradePurchased(upgrade.id);
+        
+        const upgradeElement = document.createElement('div');
+        upgradeElement.className = 'upgrade-item';
+        upgradeElement.innerHTML = `
+            <h3>${upgrade.name}</h3>
+            <p>${upgrade.description}</p>
+            <p class="cost">Cost: ${upgrade.cost} pts</p>
+            <p class="status">${isPurchased ? '<span class="purchased">Purchased</span>' : '<span class="available">Available</span>'}</p>
+            <button 
+                class="purchase-btn" 
+                onclick="window.purchaseUpgrade('${upgrade.id}')" 
+                ${isPurchased ? 'disabled' : ''}
+                ${playerScore < upgrade.cost ? 'disabled' : ''}
+            >
+                ${isPurchased ? 'Owned' : `Purchase (${upgrade.cost})`}
+            </button>
+        `;
+        
+        upgradesContainer.appendChild(upgradeElement);
+    });
+}
+
 // Export UI functions for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { 
@@ -200,12 +253,15 @@ if (typeof module !== 'undefined' && module.exports) {
         updateScore,
         updateLives,
         updateLevel,
+        updateCombo,
         showMainMenu,
         showStartScreen,
         showControlsScreen,
         showSettingsScreen,
         showCreditsScreen,
-        goToMainMenu
+        goToMainMenu,
+        showUpgradeShop,
+        updateUpgradeShopDisplay
     };
 } else {
     window.UI = { 
@@ -220,11 +276,14 @@ if (typeof module !== 'undefined' && module.exports) {
         updateScore,
         updateLives,
         updateLevel,
+        updateCombo,
         showMainMenu,
         showStartScreen,
         showControlsScreen,
         showSettingsScreen,
         showCreditsScreen,
-        goToMainMenu
+        goToMainMenu,
+        showUpgradeShop,
+        updateUpgradeShopDisplay
     };
 }
