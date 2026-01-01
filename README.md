@@ -15,6 +15,7 @@ Drive along a glowing neon highway, avoid incoming traffic, collect coins, and t
   - [Difficulty & Levels](#difficulty--levels)
   - [Lives & Game Over](#lives--game-over)
   - [Coins & High Scores](#coins--high-scores)
+- [New Features Added](#new-features-added)
 - [Screens & UI](#screens--ui)
 - [Responsive Design](#responsive-design)
 - [Project Structure](#project-structure)
@@ -50,6 +51,30 @@ Drive along a glowing neon highway, avoid incoming traffic, collect coins, and t
   - High Scores.
 - **Responsive layout** that scales to different screen sizes while keeping a clean 4:3 play area.
 - **Modular codebase** split into configuration, input, UI, rendering, and main game logic files.
+
+---
+
+## New Features Added
+
+Since the original version, the game has been enhanced with the following features:
+
+- **Difficulty Progression**: Increasing speed, spawn frequency, and obstacle patterns as the game progresses.
+- **Power-ups System**: Three distinct power-ups:
+  - Shield: Temporary invincibility against collisions
+  - Slow Motion: Slows down game speed temporarily
+  - Score Multiplier: Doubles score temporarily
+- **Lane-based Spawning**: 4-lane system with different obstacle patterns (Single, Double, Triple, Chain).
+- **Combo/Streak System**: Bonus points for consecutive safe actions without collisions.
+- **Level/Rank System**: Rank progression from "Rookie" to "Legend" based on score.
+- **Upgrade Shop**: Persistent upgrades between game sessions using localStorage:
+  - Speed Boost
+  - Extended Shield Duration
+  - Score Boost Duration
+  - Time Warp Duration
+  - Extra Life
+- **Particle Effects**: Visual effects for collisions, coin/power-up collection, and level ups.
+- **Audio System**: Sound effects for collisions, collection, level ups, and button clicks with mute functionality.
+- **Performance Optimizations**: Improved collision detection, rendering performance, and game loop efficiency.
 
 ---
 
@@ -116,18 +141,20 @@ The game uses several overlay screens:
 
 - **Main Menu**
   - Game title.
-  - Buttons: *Start Game*, *High Scores*, *Controls*, *Settings*, *Credits*.
+  - Buttons: *Start Game*, *High Scores*, *Upgrade Shop*, *Controls*, *Settings*, *Credits*.
 - **Controls Screen**
   - Explains keyboard, mouse, and touch controls.
 - **Settings Screen**
-  - Placeholder for options such as sound toggle or difficulty adjustments (depending on implementation).
+  - Sound toggle option to mute/unmute audio.
 - **Credits Screen**
   - Basic credits for the author and technologies used.
+- **Upgrade Shop Screen**
+  - Allows purchasing upgrades with earned points.
 - **High Scores Screen**
   - Table listing top scores (name + score).
-  - “Back” button to return to menu.
+  - "Back" button to return to menu.
 - **Pause Screen**
-  - Semi‑transparent overlay with “Paused” message.
+  - Semi‑transparent overlay with "Paused" message.
   - Resume option.
 - **Game Over Screen**
   - Shows final score.
@@ -197,6 +224,7 @@ Typical file layout:
   - Player car (body, windows, wheels),
   - Enemy cars / obstacles,
   - Coins, including gradients or 3D‑style effects,
+  - Power-ups and visual effects,
   - Optional pause or effect overlays.
 
 - `ui.js`  
@@ -205,7 +233,8 @@ Typical file layout:
   - Functions for navigation buttons (menu, start, back, etc.),
   - High‑score storage and retrieval using `localStorage`,
   - Filling the high‑score table in the DOM,
-  - Handling saving a new high score.
+  - Handling saving a new high score,
+  - Upgrade shop functionality.
 
 - `README.md`  
   Project documentation (this file).
@@ -227,3 +256,72 @@ Typical file layout:
 
 1. **Clone the repository**
 
+   ```bash
+   git clone https://github.com/MeTariqul/-Neon-Highway-Dodge.git
+   ```
+
+2. **Open the game**
+
+   - Option 1: Open `index.html` directly in your browser.
+   - Option 2: Start a local server (e.g., using Python's `http.server` or Node's `http-server`):
+
+     ```bash
+     # Using Python 3
+     python -m http.server 8000
+
+     # Using Node.js with http-server
+     npx http-server
+     ```
+
+     Then navigate to `http://localhost:8000` (or the port shown in your terminal).
+
+---
+
+## Configuration
+
+Game parameters are defined in `config.js`. You can customize:
+
+- Canvas dimensions
+- Player size and speed
+- Obstacle/coin sizes and spawn rates
+- Level progression settings
+- Power-up settings
+- Audio settings
+- UI element names and thresholds
+
+---
+
+## Customization Ideas
+
+- Add new power-up types
+- Implement different enemy car designs
+- Add visual effects (screen shake, particle systems)
+- Introduce new game modes (time-limited, survival, etc.)
+- Add achievements system
+- Implement local multiplayer
+
+---
+
+## Planned Improvements
+
+- Further performance optimizations
+- Additional power-up types
+- Enhanced visual effects
+- More challenging obstacle patterns
+- Achievements system
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
